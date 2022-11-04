@@ -3,62 +3,95 @@ library(dplyr)
 library(psych)
 library(GPArotation)
 library(corpcor)
+library(hetcor)
+library(polycor)
+library(xtable)
 
-data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+#data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
 temporaryData = data %>% 
   select(ResponseId, Q1) %>% #Just selecting data related to 'what is project success question
   filter(!is.na(Q1)) %>% #Removing all unanswered obs 
   slice(n=-1) %>% #removing first two rows which are ireelevant
   slice(n=-1) %>%   #removing first two rows which are ireelevant  %>% 
-  tidyr::separate_rows(Q1, sep = ",")%>% #separating out the data contained in each observation 
+  tidyr::separate_rows(Q1, sep = ",") %>% #separating out the data contained in each observation 
   filter(Q1 != "") %>% #Removing any empty values
   mutate(value = 1) %>% #converting values into dummies
   tidyr::pivot_wider(    
     names_from = Q1,
     values_from = value,
     values_fill = 0 #sorting everything out
-  )  
-cleanData <- temporaryData[,c(1,5,2,3,4,17,6,7,8,9,12,16,10,14,11,15,18,13)] %>% 
-  subset(select =-c(1,6,12,18)) %>% 
+  ) %>% 
   rename(
-      timePerf = 1,
-      scopePerf = 2,
-      budgetPerf = 3,
-      safetyPerf = 4,
-      custSat = 5,
-      stakeSat = 6,
-      supplierSat = 7,
-      teamSat = 8,
-      publicSat = 9,
-      userBene = 10,
-      orgShortBene = 11,
-      orgLongBene = 12,
-      employeeRet = 13,
-      SocBene = 14
-  ) #could be some confusion here double check things in some detail
+    costPerf = 2,
+    safetyPerf = 3,
+    timePerf = 4,
+    scopePerf = 5,
+    otherToBeDeleted = 6,
+    userSat = 7,
+    stakeholderSat = 8,
+    supplierSat = 9,
+    teamSat = 10,
+    publicSat = 11,
+    otherToBeDeleted2 = 12,
+    userBene = 13,
+    orgShortBene = 14,
+    orgLongBene = 15,
+    empRet = 16,
+    SocBene = 17,
+    otherToBeDeleted3 = 18
+  )
+cleanData <- temporaryData[,c("costPerf",
+                              "timePerf",
+                              "scopePerf",
+                              "safetyPerf",
+                              "userSat",
+                              "stakeholderSat",
+                              "supplierSat",
+                              "teamSat",
+                              "publicSat",
+                              "userBene",
+                              "orgShortBene",
+                              "orgLongBene",
+                              "empRet",
+                              "SocBene")] #moving data into a cleanDataset using a more logical listing format  
 
-S <- cov(cleanData)
-S.eigen <- eigen(S)
-plot(S.eigen$values, xlab = 'Eigenvalue Number', ylab = 'Eigenvalue Size', main = 'Scree Graph', type = 'b', xaxt = 'n')
-axis(1, at = seq(1, 15, by = 1))
+#given that we've got binary values (either 0 or 1) we follow the isntructions provided here - https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwiYyfqo4JT7AhVVoVwKHefJBXcQFnoECBMQAQ&url=https%3A%2F%2Fit.unt.edu%2Fsites%2Fdefault%2Ffiles%2Fbinaryfa_l_jds_sep2014_0.pdf&usg=AOvVaw3FDWJhR1m9ZqwRGoDHh3CE which proved very useful
 
-corMatrix <- cor(cleanData)
-roundCorMatrix <- round(corMatrix, 2)
+df.2 <- sapply(cleanData, as.factor) #turning into factors
 
-cortest.bartlett(cleanData)
-KMO(cleanData) #0.83 - 'good'
+het.mat <- hetcor(df.2)$cor #creating a correlation matrix - everything looks fairly ok
+KMO(cleanData) #produces value of 0.83 which is regarded as 'meritorous'
+bartlett.test(cleanData) #statistically significant  with chi(square) of 1268.2 and p value much much less than 0.01
+det(het.mat) #checking determinent of correlation matrix produces value of 0.00042... which is greater than critical value of 0.00001 which is good
 
-det(corMatrix) #0.091679 - much higher than critical value of 0.00001
+pilot <- principal(cleanData, nfactors = 14, rotate = "none")
 
-pc1 <- principal(cleanData, nfactors=4, rotate="varimax")
-pc1
+scree_plot <- plot(pilot$values, type="b", xlab="Number", ylab="Eigenvalue") #produces a scree plot ;looks like about 3 or four factors is about right
+pilot$values #Based on the values only 3 are above 1 so three is right
 
-plot(pc1$values, type="b")
+png('scree_plot.png')
+dev.copy(scree_plot, 'scree_plot.png') #Saving this for later!
 
-factor.model(pc1$loadings)
 
-residuals <- factor.residuals(corMatrix, pc1$loadings) %>% 
-  as.matrix(residuals[upper.tri(residuals)]) 
-large.resid <- abs(residuals) > 0.5
-sum(large.resid)
-sum(large.resid/nrow(residuals))
+corMatrixTable <- print(het.mat)
+print(xtable(corMatrixTable, type = "latex"), file = "corMatrixTable.tex")
+eigenvalueTable <- print(pilot$values)
+print(xtable(eigenvalueTable, type = "latex"), file = "eigenvalueTable.tex")
+
+fa.1 <- factanal(covmat = het.mat, factors = 1, rotation = "varimax")
+fa.2 <- factanal(covmat = het.mat, factors = 2, rotation = "varimax")
+fa.3 <- factanal(covmat = het.mat, factors = 3, rotation = "varimax")
+fa.4 <- factanal(covmat = het.mat, factors = 4, rotation = "varimax")
+fa.5 <- factanal(covmat = het.mat, factors = 5, rotation = "varimax")
+
+#creating a series of factor based models based on number provided using varimax rotation as used mostly in the literature - three is probably best but we'll run it with a few for fun
+
+print(fa.3, digits = 2, cutoff=0.44, sort = TRUE) #Using Kaiser rule of only selecting factors with eigenvalues >= 1
+print(fa.4, digits = 2, cutoff=0.44, sort = TRUE) #
+
+#TODO 
+#Save eigenvalue table as Latex
+#save all other outputs as latex
+
+
