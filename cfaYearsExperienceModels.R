@@ -9,6 +9,7 @@ library(DiagrammeRsvg)
 library(rsvg)
 library(semTable)
 library(psych)
+library(semTools)
 
 #data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
 data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
@@ -150,7 +151,7 @@ run_analysis <- function(df) {
   print(s1)
   print(s2)
   print(s3)
-
+  
   # # Generate path diagrams and save them
   ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
   multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
@@ -161,12 +162,11 @@ run_analysis <- function(df) {
   save_png(tesseractPathDiagram, filename = paste0(substitute(df), "tesseractPathDiagram.png"))
 
   # Return the results
-  return(df)#, s1 = s1, s2 = s2, s3 = s3))
+  return(list(df = df, s1 = s1, s2 = s2, s3 = s3))#, s1 = s1, s2 = s2, s3 = s3))
 }
 
-run_analysis(df_1)
-# for (i in 1:6) {
-#   df_name <- paste0("df_", i)
-#   run_analysis(paste0("df_", i))
-# }
+run_analysis(df_6)  
+models <- list(fitIron, fitMulti, fitTesseract)
+compareLavaan(models, type = "Latex")
+print("Iron Triangle: ", s1, "\n", "Multidimensional: ", s2, "\n", "Tesseract: ", s3, "\n")
 
