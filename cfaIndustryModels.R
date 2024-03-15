@@ -13,15 +13,15 @@ library(semTools)
 
 #data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
 data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
-temporaryDataExperience = data %>% 
-  dplyr::select(ResponseId, Q1, Q15) %>% #Just selecting data related to 'what is project success question
+temporaryDataIndustry = data %>% 
+  dplyr::select(ResponseId, Q1, Q17) %>% #Just selecting data related to 'what is project success question
   filter(!is.na(Q1)) %>% #Removing all unanswered obs
-  filter(!is.na(Q15)) %>% 
+  filter(!is.na(Q17)) %>% 
   slice(-1) %>% #removing first two rows which are ireelevant
   slice(-1) %>%   #removing first two rows which are ireelevant  %>% 
   tidyr::separate_rows(Q1, sep = ",") %>% #separating out the data contained in each observation 
   filter(Q1 != "") %>% #Removing any empty values
-  filter(Q15 != "") %>%
+  filter(Q17 != "") %>%
   mutate(value = 1) %>% #converting values into dummies
   tidyr::pivot_wider(    
     names_from = Q1,
@@ -46,68 +46,78 @@ temporaryDataExperience = data %>%
     "EmployeeRetention" = 17,
     "SocietalBenefits" = 18,
     "otherToBeDeleted3" = 19,
-    "Years_of_experience" = 2
+    "industry" = 2
   )
-cleanDataExperience <- temporaryDataExperience[,c("Years_of_experience",
-                              "CostPerformance",
-                              "TimePerformance",
-                              "ScopePerformance",
-                              "SafetyPerformance",
-                              "UserSatisfaction",
-                              "StakeholderSatisfaction",
-                              "SupplierSatisfaction",
-                              "TeamSatisfaction",
-                              "PublicSatisfaction",
-                              "UserBenefits",
-                              "ShortTermOrganizationalBenefits",
-                              "LongTermOrganizationalBenefits",
-                              "EmployeeRetention",
-                              "SocietalBenefits")]#moving data into a cleanDataset using a more logical listing format  
+cleanDataIndustry <- temporaryDataIndustry[,c("industry",
+                                            "CostPerformance",
+                                            "TimePerformance",
+                                            "ScopePerformance",
+                                            "SafetyPerformance",
+                                            "UserSatisfaction",
+                                            "StakeholderSatisfaction",
+                                            "SupplierSatisfaction",
+                                            "TeamSatisfaction",
+                                            "PublicSatisfaction",
+                                            "UserBenefits",
+                                            "ShortTermOrganizationalBenefits",
+                                            "LongTermOrganizationalBenefits",
+                                            "EmployeeRetention",
+                                            "SocietalBenefits")]#moving data into a cleanDataset using a more logical listing format  
 
-dfTemp1 = cleanDataExperience
-df_temp1 <- subset(dfTemp1, select = -c(Years_of_experience))
-df.2 <- as.data.frame(lapply(df_temp1, factor))
+dfTemp1 = cleanDataIndustry
+df_industrytemp1 <- subset(dfTemp1, select = -c(industry))
+df.2 <- as.data.frame(lapply(df_industrytemp1, factor))
 het.mat <- hetcor(df.2)$cor #creating a correlation matrix - everything looks fairly ok
-KMO(df_temp1) #produces value of 0.83 which is regarded as 'meritorous'
+KMO(df_industrytemp1) #produces value of 0.83 which is regarded as 'meritorous'
 print(het.mat)
-bartlett.test(df_temp1) #statistically significant  with chi(square) of 1268.2 and p value much much less than 0.01
+bartlett.test(df_industrytemp1) #statistically significant  with chi(square) of 1268.2 and p value much much less than 0.01
 det(het.mat) 
 
-demographic_groups <- unique(cleanDataExperience$`Years_of_experience`)
-list_of_dataframes <- lapply(demographic_groups, function(group) {
-  your_data_subset <- cleanDataExperience[cleanDataExperience$`Years_of_experience` == group, ]
+industry_groups <- unique(cleanDataIndustry$`industry`)
+list_of_dataframes <- lapply(industry_groups, function(group) {
+  your_data_subset <- cleanDataIndustry[cleanDataIndustry$`industry` == group, ]
   return(your_data_subset)
 })
 
 # Assign each dataframe to a variable
 for (i in seq_along(list_of_dataframes)) {
-  assign(paste0("df_", demographic_groups[i]), list_of_dataframes[[i]])
+  assign(paste0("df_industry", industry_groups[i]), list_of_dataframes[[i]])
 }
 
 # Assuming cleanData is a list of dataframes
-list_of_dataframes <- list(df_1 = df_1, 
-                           df_2 = df_2,
-                           df_3 = df_3, 
-                           df_4 = df_4,
-                           df_5 = df_5,
-                           df_6 = df_6)  # List of your dataframes
+list_of_dataframes <- list(df_industry9 = df_industry9, 
+                           df_industry8 = df_industry8,
+                           df_industry7 = df_industry7, 
+                           df_industry6 = df_industry6,
+                           df_industry5 = df_industry5,
+                           df_industry4 = df_industry4,
+                           df_industry3 = df_industry3,
+                           df_industry21 = df_industry21,
+                           df_industry20 = df_industry20,
+                           df_industry2 = df_industry2,
+                           df_industry19 = df_industry19,
+                           df_industry18 = df_industry18,
+                           df_industry17 = df_industry17,
+                           df_industry16 = df_industry16,
+                           df_industry15 = df_industry15,
+                           df_industry14 = df_industry14,
+                           df_industry13 = df_industry13,
+                           df_industry12 = df_industry12,
+                           df_industry11 = df_industry11,
+                           df_industry10 = df_industry10)  # List of your dataframes
 
-for (df_name in names(list_of_dataframes)) {
+for (df_industryname in names(list_of_dataframes)) {
   # Get the data frame
-  df_temp <- get(df_name)
+  df_industrytemp <- get(df_industryname)
   
-  # Remove the column "Years_of_experience"
-  df_temp <- subset(df_temp, select = -c(Years_of_experience))
+  # Remove the column "industry"
+  df_industrytemp <- subset(df_industrytemp, select = -c(industry))
   
   # Assign the modified data frame back to its original name
-  assign(df_name, df_temp)
+  assign(df_industryname, df_industrytemp)
 }
 
-# Define the models
-num_nans <- sum(is.na(df_6))
 
-# Print the result
-print(num_nans)
 # Define a function to perform the analysis and save results
 run_analysis <- function(df) {
   # Convert non-numeric columns to factors
@@ -137,12 +147,12 @@ run_analysis <- function(df) {
   fitIron <- cfa(ironTriangle.model, data = df)
   fitMulti <- cfa(multidimensional.model, data = df)
   fitTesseract <- cfa(tesseract.model, data = df)
-
+  
   # Summarize the fits
   s1 <- summary(fitIron, fit.measures = TRUE)
   s2 <- summary(fitMulti, fit.measures = TRUE)
   s3 <- summary(fitTesseract, fit.measures = TRUE)
-
+  
   # print(s1)
   # print(s2)
   # print(s3)
@@ -151,22 +161,36 @@ run_analysis <- function(df) {
   ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
   multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
   tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
-# 
+  # 
   # save_png(ironTrianglePathDiagram, filename = paste0(substitute(df), "_ironTrianglePathDiagram.png"))
   # save_png(multidimensionalPathDiagram, filename = paste0(substitute(df), "multidimensionalPathDiagram.png"))
   # save_png(tesseractPathDiagram, filename = paste0(substitute(df), "tesseractPathDiagram.png"))
-
+  
   # Return the results
   models <- list(fitIron, fitMulti, fitTesseract)
   results <- compareLavaan(models)
   return(results)#, s1 = s1, s2 = s2, s3 = s3))
 }
 
-df_1_results <- run_analysis(df_1)
-df_2_results <- run_analysis(df_2)
-df_3_results <- run_analysis(df_3)
-df_4_results <- run_analysis(df_4)
-df_5_results <- run_analysis(df_5)
-df_6_results <- run_analysis(df_6)
+df_industry10_results <- run_analysis(df_industry10)
+#df_industry11_results <- run_analysis(df_industry11)
+df_industry12_results <- run_analysis(df_industry12)
+df_industry13_results <- run_analysis(df_industry13)
+#df_industry14_results <- run_analysis(df_industry14)
+df_industry15_results <- run_analysis(df_industry15)
+df_industry16_results <- run_analysis(df_industry16)
+df_industry17_results <- run_analysis(df_industry17)
+df_industry18_results <- run_analysis(df_industry18)
+df_industry19_results <- run_analysis(df_industry19)
+df_industry2_results <- run_analysis(df_industry2)
+df_industry20_results <- run_analysis(df_industry20)
+df_industry21_results <- run_analysis(df_industry21)
+df_industry3_results <- run_analysis(df_industry3)
+df_industry4_results <- run_analysis(df_industry4)
+df_industry5_results <- run_analysis(df_industry5)
+df_industry6_results <- run_analysis(df_industry6)
+df_industry7_results <- run_analysis(df_industry7)
+df_industry8_results <- run_analysis(df_industry8)
+df_industry9_results <- run_analysis(df_industry9)
 
 
