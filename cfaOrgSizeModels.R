@@ -11,8 +11,8 @@ library(semTable)
 library(psych)
 library(semTools)
 
-#data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
-data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+# data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
 temporaryDataOrgSize = data %>% 
   dplyr::select(ResponseId, Q1, Q16) %>% #Just selecting data related to 'what is project success question
   filter(!is.na(Q1)) %>% #Removing all unanswered obs
@@ -64,14 +64,14 @@ cleanDataOrgSize <- temporaryDataOrgSize[,c("Organization_size",
                                                   "EmployeeRetention",
                                                   "SocietalBenefits")]#moving data into a cleanDataset using a more logical listing format  
 
-dfTemp1 = cleanDataOrgSize
-df_org_sizetemp1 <- subset(dfTemp1, select = -c(Organization_size))
-df.2 <- as.data.frame(lapply(df_org_sizetemp1, factor))
-het.mat <- hetcor(df.2)$cor #creating a correlation matrix - everything looks fairly ok
-KMO(df_org_sizetemp1) #produces value of 0.83 which is regarded as 'meritorous'
-print(het.mat)
-bartlett.test(df_org_sizetemp1) #statistically significant  with chi(square) of 1268.2 and p value much much less than 0.01
-det(het.mat) 
+# dfTemp1 = cleanDataOrgSize
+# df_org_sizetemp1 <- subset(dfTemp1, select = -c(Organization_size))
+# df.2 <- as.data.frame(lapply(df_org_sizetemp1, factor))
+# het.mat <- hetcor(df.2)$cor #creating a correlation matrix - everything looks fairly ok
+# KMO(df_org_sizetemp1) #produces value of 0.83 which is regarded as 'meritorous'
+# print(het.mat)
+# bartlett.test(df_org_sizetemp1) #statistically significant  with chi(square) of 1268.2 and p value much much less than 0.01
+# det(het.mat) 
 
 org_groups <- unique(cleanDataOrgSize$`Organization_size`)
 list_of_dataframes <- lapply(org_groups, function(group) {
@@ -81,7 +81,7 @@ list_of_dataframes <- lapply(org_groups, function(group) {
 
 # Assign each dataframe to a variable
 for (i in seq_along(list_of_dataframes)) {
-  assign(paste0("df_org_size", demographic_groups[i]), list_of_dataframes[[i]])
+  assign(paste0("df_org_size", org_groups[i]), list_of_dataframes[[i]])
 }
 
 # Assuming cleanData is a list of dataframes
@@ -103,10 +103,10 @@ for (df_org_sizename in names(list_of_dataframes)) {
 }
 
 # Define the models
-num_nans <- sum(is.na(df_org_size6))
-
-# Print the result
-print(num_nans)
+# num_nans <- sum(is.na(df_org_size6))
+# 
+# # Print the result
+# print(num_nans)
 # Define a function to perform the analysis and save results
 run_analysis <- function(df) {
   # Convert non-numeric columns to factors
@@ -147,9 +147,9 @@ run_analysis <- function(df) {
   # print(s3)
   
   # # Generate path diagrams and save them
-  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
-  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
-  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
+  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
+  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
+  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
   # 
   # save_png(ironTrianglePathDiagram, filename = paste0(substitute(df), "_ironTrianglePathDiagram.png"))
   # save_png(multidimensionalPathDiagram, filename = paste0(substitute(df), "multidimensionalPathDiagram.png"))
