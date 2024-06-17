@@ -103,7 +103,7 @@ for (df_org_sizename in names(list_of_dataframes)) {
 }
 
 # Define the models
-num_nans <- sum(is.na(df_org_size6))
+#num_nans <- sum(is.na(df_org_size6))
 
 # Print the result
 print(num_nans)
@@ -161,10 +161,16 @@ run_analysis <- function(df) {
   return(results)#, s1 = s1, s2 = s2, s3 = s3))
 }
 
-df_org_size1_results <- run_analysis(df_org_size1)
-df_org_size2_results <- run_analysis(df_org_size2)
-df_org_size3_results <- run_analysis(df_org_size3)
-df_org_size4_results <- run_analysis(df_org_size4)
-df_org_size5_results <- run_analysis(df_org_size5)
+lessThan30 = df_org_size1
+thirtyTo100 = df_org_size2
+hundredTo500 = df_org_size3
+fiveHundredTo1000 = df_org_size4
+moreThan1000 = df_org_size5
+
+less_than_30_results <- run_analysis(lessThan30)
+thirtyTo100_results <- run_analysis(thirtyTo100)
+hundredTo500_results <- run_analysis(hundredTo500)
+fiveHundredTo1000_results <- run_analysis(fiveHundredTo1000)
+moreThan1000_results <- run_analysis(moreThan1000)
 
 

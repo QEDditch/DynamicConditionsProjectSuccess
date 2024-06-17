@@ -162,11 +162,18 @@ run_analysis <- function(df) {
   return(results)#, s1 = s1, s2 = s2, s3 = s3))
 }
 
-df_1_results <- run_analysis(df_1)
-df_2_results <- run_analysis(df_2)
-df_3_results <- run_analysis(df_3)
-df_4_results <- run_analysis(df_4)
-df_5_results <- run_analysis(df_5)
-df_6_results <- run_analysis(df_6)
+lessThanTwoYearsExperience = df_1
+twoToFiveYearsExperience = df_2
+fiveToTenYearsExperience = df_3
+tenToFifteenYearsExperience= df_4
+fifteenToTwentyYearsExperience = df_5
+overTwentyYearsExperience = df_6
+
+less_than_two_years_results <- run_analysis(lessThanTwoYearsExperience)
+two_to_five_years_results <- run_analysis(twoToFiveYearsExperience)
+five_to_ten_years_results <- run_analysis(fiveToTenYearsExperience)
+ten_to_fifteen_years_results <- run_analysis(tenToFifteenYearsExperience)
+fifteen_to_twenty_years_results <- run_analysis(fifteenToTwentyYearsExperience)
+more_than_twenty_years_results <- run_analysis(overTwentyYearsExperience)
 
 

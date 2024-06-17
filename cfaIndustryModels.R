@@ -162,33 +162,54 @@ run_analysis <- function(df) {
   multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
   tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
   # 
-  # save_png(ironTrianglePathDiagram, filename = paste0(substitute(df), "_ironTrianglePathDiagram.png"))
-  # save_png(multidimensionalPathDiagram, filename = paste0(substitute(df), "multidimensionalPathDiagram.png"))
-  # save_png(tesseractPathDiagram, filename = paste0(substitute(df), "tesseractPathDiagram.png"))
-  
+  save_png(ironTrianglePathDiagram, filename = paste0(substitute(df), "_ironTrianglePathDiagram.png"))
+  save_png(multidimensionalPathDiagram, filename = paste0(substitute(df), "multidimensionalPathDiagram.png"))
+  save_png(tesseractPathDiagram, filename = paste0(substitute(df), "tesseractPathDiagram.png"))
+
   # Return the results
   models <- list(fitIron, fitMulti, fitTesseract)
   results <- compareLavaan(models)
   return(results)#, s1 = s1, s2 = s2, s3 = s3))
 }
 
-df_education_results <- run_analysis(df_industry10)
-#df_wholesale_trade_results <- run_analysis(df_industry11)
-df_healthcare_results <- run_analysis(df_industry12)
-#df_retail_results <- run_analysis(df_industry13)
-#df_arts_and_entertainment_results <- run_analysis(df_industry14)
-df_transport_warehousing_results <- run_analysis(df_industry15)
-df_accomodation_or_food_service_results <- run_analysis(df_industry16)
-df_information_results <- run_analysis(df_industry17)
-df_other_services_results <- run_analysis(df_industry18)
-df_finance_or_insurance_results <- run_analysis(df_industry19)
-df_real_estate_results <- run_analysis(df_industry2)
-df_unclassified_results <- run_analysis(df_industry20)
-df_government_results <- run_analysis(df_industry21)
-df_mining_results <- run_analysis(df_industry3)
-df_prof_science_technical_services_results <- run_analysis(df_industry4)
-df_utilities_results <- run_analysis(df_industry5)
-df_management_results <- run_analysis(df_industry6)
-df_construction_results <- run_analysis(df_industry7)
-df_admin_support_waste_mgmt_results <- run_analysis(df_industry8)
-df_manufacturing_results <- run_analysis(df_industry9)
+education = df_industry10
+healthcare = df_industry12
+transport_warehousing = df_industry15
+accomodation_or_food_service = df_industry16
+information = df_industry17
+other_services = df_industry18
+finance_or_insurance = df_industry19
+real_estate = df_industry2
+unclassified = df_industry20
+government = df_industry21
+mining = df_industry3
+prof_science_technical_services = df_industry4
+utilities = df_industry5
+management = df_industry6
+construction = df_industry7
+admin_support_waste_mgmt = df_industry8
+manufacturing = df_industry9
+wholesale_trade = df_industry11
+retail = df_industry13
+arts_and_entertainment = df_industry14
+
+education_results <- run_analysis(education)
+#wholesale_trade_results <- run_analysis(wholesale_trade)
+healthcare_results <- run_analysis(healthcare)
+#retail_results <- run_analysis(retail)
+#arts_and_entertainment_results <- run_analysis(arts_and_entertainment)
+transport_warehousing_results <- run_analysis(transport_warehousing)
+accomodation_or_food_service_results <- run_analysis(accomodation_or_food_service)
+information_results <- run_analysis(information)
+other_services_results <- run_analysis(other_services)
+finance_or_insurance_results <- run_analysis(finance_or_insurance)
+real_estate_results <- run_analysis(real_estate)
+unclassified_results <- run_analysis(unclassified)
+government_results <- run_analysis(government)
+mining_results <- run_analysis(mining)
+prof_science_technical_services_results <- run_analysis(prof_science_technical_services)
+utilities_results <- run_analysis(utilities)
+management_results <- run_analysis(management)
+construction_results <- run_analysis(construction)
+admin_support_waste_mgmt_results <- run_analysis(admin_support_waste_mgmt)
+manufacturing_results <- run_analysis(manufacturing)
