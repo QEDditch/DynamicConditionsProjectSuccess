@@ -157,21 +157,70 @@ run_analysis <- function(df) {
   # print(s2)
   # print(s3)
   
-  # # Generate path diagrams and save them
-  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
-  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
-  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
-  # 
+  # Define the subfolder
+  subfolder <- "output/images/industry"
   
-  subfolder = "output/images/industry"
+  # Check if the subfolder exists, and create it if it doesn't
   if (!dir.exists(subfolder)) {
     dir.create(subfolder, recursive = TRUE)
   }
   
-  save_png(ironTrianglePathDiagram, filename = paste0(subfolder, "/", substitute(df), "_ironTrianglePathDiagram.png"))
-  save_png(multidimensionalPathDiagram, filename = paste0(subfolder, "/", substitute(df), "multidimensionalPathDiagram.png"))
-  save_png(tesseractPathDiagram, filename = paste0(subfolder, "/", substitute(df), "tesseractPathDiagram.png"))
-
+  # Define the filenames for the diagrams
+  ironTriangleFilename <- paste0(subfolder, "/",substitute(df), "_ironTrianglePathDiagram.png")
+  multidimensionalFilename <- paste0(subfolder, "/", substitute(df), "_multidimensionalPathDiagram.png")
+  tesseractFilename <- paste0(subfolder, "/", substitute(df), "_tesseractPathDiagram.png")
+  
+  # Generate the diagrams with the correct file paths
+  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, 
+                                               what = "path", 
+                                               whatLabels = "std", 
+                                               style = "lisrel", 
+                                               edge.label.cex = .9, 
+                                               rotation = 1, 
+                                               curve = 2, 
+                                               layoutSplit = FALSE, 
+                                               normalize = FALSE, 
+                                               filetype = "png", 
+                                               filename = ironTriangleFilename, 
+                                               height = 9, 
+                                               width = 6.5, 
+                                               residScale = 10)
+  
+  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, 
+                                                   what = "path", 
+                                                   whatLabels = "std", 
+                                                   style = "lisrel", 
+                                                   edge.label.cex = .9, 
+                                                   rotation = 1, 
+                                                   curve = 2, 
+                                                   layoutSplit = FALSE, 
+                                                   normalize = FALSE, 
+                                                   filetype = "png", 
+                                                   filename = multidimensionalFilename, 
+                                                   height = 9, 
+                                                   width = 6.5, 
+                                                   residScale = 10)
+  
+  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, 
+                                            what = "path", 
+                                            whatLabels = "std", 
+                                            style = "lisrel", 
+                                            edge.label.cex = .9, 
+                                            rotation = 1, 
+                                            curve = 2, 
+                                            layoutSplit = FALSE, 
+                                            normalize = FALSE, 
+                                            filetype = "png", 
+                                            filename = tesseractFilename, 
+                                            height = 9, 
+                                            width = 6.5, 
+                                            residScale = 10)
+  
+  # Return the results
+  models <- list(fitIron, fitMulti, fitTesseract)
+  results <- compareLavaan(models)
+  return(results)
+  
   # Return the results
   models <- list(fitIron, fitMulti, fitTesseract)
   results <- compareLavaan(models)
@@ -219,3 +268,42 @@ management_results <- run_analysis(management)
 construction_results <- run_analysis(construction)
 admin_support_waste_mgmt_results <- run_analysis(admin_support_waste_mgmt)
 manufacturing_results <- run_analysis(manufacturing)
+# 
+# # Function to extract fit indices
+# extract_fit_indices <- function(fit) {
+#   indices <- fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr"))
+#   return(indices)
+# }
+# 
+# # Example to extract fit indices for each industry
+# education_fit_indices <- extract_fit_indices(education_results$fitIron)
+# healthcare_fit_indices <- extract_fit_indices(healthcare_results$fitIron)
+# # Repeat for other industries
+# 
+# # Combine fit indices into a dataframe for comparison
+# fit_indices_df <- data.frame(
+#   Industry = c("Education", "Healthcare", "Transport", "Accommodation", "Information", 
+#                "Other Services", "Finance", "Real Estate", "Unclassified", "Government", 
+#                "Mining", "Professional Services", "Utilities", "Management", "Construction", 
+#                "Admin Support", "Manufacturing"),
+#   CFI = c(education_fit_indices["cfi"], healthcare_fit_indices["cfi"], ...),  # Continue for each industry
+#   TLI = c(education_fit_indices["tli"], healthcare_fit_indices["tli"], ...),
+#   RMSEA = c(education_fit_indices["rmsea"], healthcare_fit_indices["rmsea"], ...),
+#   SRMR = c(education_fit_indices["srmr"], healthcare_fit_indices["srmr"], ...)
+# )
+# 
+# # Print the comparison table
+# print(fit_indices_df)
+# 
+# # Visualization with ggplot2
+# library(ggplot2)
+# 
+# # Melt the dataframe for ggplot2
+# fit_indices_melted <- reshape2::melt(fit_indices_df, id.vars = "Industry")
+# 
+# # Plot the fit indices comparison
+# ggplot(fit_indices_melted, aes(x = Industry, y = value, fill = variable)) +
+#   geom_bar(stat = "identity", position = "dodge") +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   labs(title = "Fit Indices Comparison Across Industries", y = "Value", fill = "Fit Index")
+# 

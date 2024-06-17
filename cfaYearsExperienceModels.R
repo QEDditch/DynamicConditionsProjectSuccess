@@ -147,20 +147,55 @@ run_analysis <- function(df) {
   # print(s2)
   # print(s3)
   
-  # # Generate path diagrams and save them
-  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
-  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
-  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
+  ironTriangleFilename <- paste0(subfolder, "/", substitute(df), "_ironTrianglePathDiagram.png")
+  multidimensionalFilename <- paste0(subfolder, "/", substitute(df), "_multidimensionalPathDiagram.png")
+  tesseractFilename <- paste0(subfolder, "/", substitute(df), "_tesseractPathDiagram.png")
   
-  subfolder = "output/images/yearsOfExperience/"
-  if (!dir.exists(subfolder)) {
-    dir.create(subfolder, recursive = TRUE)
-  }
+  # Generate the diagrams with the correct file paths
+  semPlot::semPaths(fitIron, 
+                    what = "path", 
+                    whatLabels = "std", 
+                    style = "lisrel", 
+                    edge.label.cex = .9, 
+                    rotation = 1, 
+                    curve = 2, 
+                    layoutSplit = FALSE, 
+                    normalize = FALSE, 
+                    filetype = "png", 
+                    filename = ironTriangleFilename, 
+                    height = 9, 
+                    width = 6.5, 
+                    residScale = 10)
   
-  save_png(ironTrianglePathDiagram, filename = paste0(subfolder, substitute(df), "_ironTrianglePathDiagram.png"))
-  save_png(multidimensionalPathDiagram, filename = paste0(subfolder, substitute(df), "multidimensionalPathDiagram.png"))
-  save_png(tesseractPathDiagram, filename = paste0(subfolder, substitute(df), "tesseractPathDiagram.png"))
-
+  semPlot::semPaths(fitMulti, 
+                    what = "path", 
+                    whatLabels = "std", 
+                    style = "lisrel", 
+                    edge.label.cex = .9, 
+                    rotation = 1, 
+                    curve = 2, 
+                    layoutSplit = FALSE, 
+                    normalize = FALSE, 
+                    filetype = "png", 
+                    filename = multidimensionalFilename, 
+                    height = 9, 
+                    width = 6.5, 
+                    residScale = 10)
+  
+  semPlot::semPaths(fitTesseract, 
+                    what = "path", 
+                    whatLabels = "std", 
+                    style = "lisrel", 
+                    edge.label.cex = .9, 
+                    rotation = 1, 
+                    curve = 2, 
+                    layoutSplit = FALSE, 
+                    normalize = FALSE, 
+                    filetype = "png", 
+                    filename = tesseractFilename, 
+                    height = 9, 
+                    width = 6.5, 
+                    residScale = 10)
   # Return the results
   models <- list(fitIron, fitMulti, fitTesseract)
   results <- compareLavaan(models)

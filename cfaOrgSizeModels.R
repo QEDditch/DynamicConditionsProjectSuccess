@@ -11,8 +11,8 @@ library(semTable)
 library(psych)
 library(semTools)
 
-data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
-# data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+#data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
 temporaryDataOrgSize = data %>% 
   dplyr::select(ResponseId, Q1, Q16) %>% #Just selecting data related to 'what is project success question
   filter(!is.na(Q1)) %>% #Removing all unanswered obs
@@ -103,17 +103,7 @@ for (df_org_sizename in names(list_of_dataframes)) {
 }
 
 # Define the models
-<<<<<<< HEAD
-#num_nans <- sum(is.na(df_org_size6))
 
-# Print the result
-print(num_nans)
-=======
-# num_nans <- sum(is.na(df_org_size6))
-# 
-# # Print the result
-# print(num_nans)
->>>>>>> bdfc4ba67b6cf57f9b739ccbda49f6d11d371f23
 # Define a function to perform the analysis and save results
 run_analysis <- function(df) {
   # Convert non-numeric columns to factors
@@ -154,18 +144,47 @@ run_analysis <- function(df) {
   # print(s3)
   
   # # Generate path diagrams and save them
-  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
-  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
-  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
+  # ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
+  # multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
+  # tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
+  # # 
   # 
-  # save_png(ironTrianglePathDiagram, filename = paste0(substitute(df), "_ironTrianglePathDiagram.png"))
-  # save_png(multidimensionalPathDiagram, filename = paste0(substitute(df), "multidimensionalPathDiagram.png"))
-  # save_png(tesseractPathDiagram, filename = paste0(substitute(df), "tesseractPathDiagram.png"))
+  # subfolder = "output/images/orgSize"
+  # if (!dir.exists(subfolder)) {
+  #   dir.create(subfolder, recursive = TRUE)
+  # }
+  # 
+  # save_png(ironTrianglePathDiagram, filename <- paste0(subfolder, "/", substitute(df), "_ironTrianglePathDiagram.png"))
+  # save_png(multidimensionalPathDiagram, filename  <-  paste0(subfolder, "/", substitute(df), "multidimensionalPathDiagram.png"))
+  # save_png(tesseractPathDiagram, filename <-  paste0(subfolder, "/", substitute(df), "tesseractPathDiagram.png"))
+  # 
+  # # Return the results
+  # models <- list(fitIron, fitMulti, fitTesseract)
+  # results <- compareLavaan(models)
+  # return(results)#, s1 = s1, s2 = s2, s3 = s3))
+  # Define the subfolder
+  subfolder <- "output/images/orgSize"
+  
+  # Check if the subfolder exists, and create it if it doesn't
+  if (!dir.exists(subfolder)) {
+    dir.create(subfolder, recursive = TRUE)
+  }
+  
+  # Define the filenames for the diagrams
+  ironTriangleFilename <- paste0(subfolder, "/", substitute(df), "_ironTrianglePathDiagram.png")
+  multidimensionalFilename <- paste0(subfolder, "/", substitute(df), "_multidimensionalPathDiagram.png")
+  tesseractFilename <- paste0(subfolder, "/", substitute(df), "_tesseractPathDiagram.png")
+  
+  # Generate the diagrams with the correct file paths
+  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex = .9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = ironTriangleFilename, height = 9, width = 6.5, residScale = 10)
+  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex = .9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = multidimensionalFilename, height = 9, width = 6.5, residScale = 10)
+  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex = .9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = tesseractFilename, height = 9, width = 6.5, residScale = 10)
   
   # Return the results
   models <- list(fitIron, fitMulti, fitTesseract)
   results <- compareLavaan(models)
-  return(results)#, s1 = s1, s2 = s2, s3 = s3))
+  return(results)
+  
 }
 
 lessThan30 = df_org_size1
