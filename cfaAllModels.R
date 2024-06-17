@@ -9,8 +9,8 @@ library(DiagrammeRsvg)
 library(rsvg)
 library(semTable)
 
-#data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
-data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+data <- read_csv("/Users/de51/Library/CloudStorage/OneDrive-UniversityofSussex/Funding proposals/Wins/Success in PM/rawData/Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
+# data <- read.csv("C:\\Users\\David Eggleton\\OneDrive - University of Sussex\\Funding proposals\\Wins\\Success in PM\\rawData\\Dynamic Conditions for Project Success_April 22, 2022_19.52.csv")
 temporaryData = data %>% 
   select(ResponseId, Q1) %>% #Just selecting data related to 'what is project success question
   filter(!is.na(Q1)) %>% #Removing all unanswered obs 
@@ -70,7 +70,7 @@ s1 <- summary(fitIron, fit.measures = TRUE)
 #ironTrianglePathDiagram <- lavaanPlot(model = fitIron, node_options = list(shape = "box", fontname = "Helvetica"),
            #edge_options = list(color = "grey"), coefs = T, stand = T, sig = 0.05)
 ironTrianglePathDiagram = semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 2, curve = 2, layoutSplit = FALSE, normalize = FALSE, height = 9, width = 6.5, residScale = 10)
-save_png(ironTrianglePathDiagram, "ironTrianglePathDiagram.png")
+save_png("/output/allModel", ironTrianglePathDiagram, "ironTrianglePathDiagram.png")
 
 multidimensional.model <- 'Project Efficiency =~ TimePerformance + CostPerformance
                 Impact on the Customer =~ ScopePerformance + UserSatisfaction + UserBenefits 
@@ -79,7 +79,7 @@ multidimensional.model <- 'Project Efficiency =~ TimePerformance + CostPerforman
 fitMulti <- cfa(multidimensional.model, data = cleanData)
 s2 <- summary(fitMulti, fit.measures = TRUE)
 multidimensionalPathDiagram = semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, height = 9, width = 6.5, residScale = 10)
-save_png(multidimensionalPathDiagram, "multidimensionalPathDiagram.png")
+save_png("/output/allModel", multidimensionalPathDiagram, "multidimensionalPathDiagram.png")
 
 
 tesseract.model <- 'Project Plan Success =~ CostPerformance + TimePerformance + ScopePerformance
@@ -89,7 +89,7 @@ tesseract.model <- 'Project Plan Success =~ CostPerformance + TimePerformance + 
 fitTesseract <- cfa(tesseract.model, data = cleanData) #safety perfomance and societal benefits are negatively correlated
 s3 <- summary(fitTesseract, fit.measures = TRUE)
 tesseractPathDiagram = semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, height = 9, width = 12, residScale = 10)
-save_png(tesseractPathDiagram, "tesseractPathDiagram.png")
+save_png("/output/allModel", tesseractPathDiagram, "tesseractPathDiagram.png")
 
 
 models <- list(fitIron, fitMulti, fitTesseract)
