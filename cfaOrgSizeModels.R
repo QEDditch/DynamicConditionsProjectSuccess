@@ -105,21 +105,22 @@ for (df_org_sizename in names(list_of_dataframes)) {
 # Define the models
 
 # Define a function to perform the analysis and save results
-run_analysis <- function(df) {
+run_analysis <- function(df, org_size) {
   # Convert non-numeric columns to factors
   df.3 <- as.data.frame(lapply(df, factor))
-  het.mat <- hetcor(df.3)$cor #creating a correlation matrix - everything looks fairly ok
+  het.mat <- hetcor(df.3)$cor
   print(het.mat)
   print("KMO test result: ")
   print(KMO(df))
-  cat("\n") #produces value of 0.83 which is regarded as 'meritorous'
-  print("Bartlet test result: ")
+  cat("\n")
+  print("Bartlett test result: ")
   print(bartlett.test(df))
-  cat("\n") #statistically significant  with chi(square) of 1268.2 and p value much much less than 0.01
+  cat("\n")
   print("Determinant of matrix: ")
   print(det(het.mat))
   cat("\n")
-  #Fit models
+  
+  # Fit models
   ironTriangle.model <- 'Iron Triangle =~ TimePerformance + CostPerformance + ScopePerformance'
   multidimensional.model <- 'Project Efficiency =~ TimePerformance + CostPerformance
                             Impact on the Customer =~ ScopePerformance + UserSatisfaction + UserBenefits 
@@ -134,69 +135,87 @@ run_analysis <- function(df) {
   fitMulti <- cfa(multidimensional.model, data = df)
   fitTesseract <- cfa(tesseract.model, data = df)
   
-  # Summarize the fits
-  s1 <- summary(fitIron, fit.measures = TRUE)
-  s2 <- summary(fitMulti, fit.measures = TRUE)
-  s3 <- summary(fitTesseract, fit.measures = TRUE)
-  
-  # print(s1)
-  # print(s2)
-  # print(s3)
-  
-  # # Generate path diagrams and save them
-  # ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_ironTrianglePathDiagram"), height = 9, width = 6.5, residScale = 10)
-  # multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = paste0(substitute(df), "_multidimensionalPathDiagram"), height = 9, width = 6.5, residScale = 10)
-  # tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path/output/orgSize", whatLabels = "std", style = "lisrel", edge.label.cex=.9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png",  filename = paste0(substitute(df), "_tesseractPathDiagram"),height = 9, width = 6.5, residScale = 10)
-  # # 
-  # 
-  # subfolder = "output/images/orgSize"
-  # if (!dir.exists(subfolder)) {
-  #   dir.create(subfolder, recursive = TRUE)
-  # }
-  # 
-  # save_png(ironTrianglePathDiagram, filename <- paste0(subfolder, "/", substitute(df), "_ironTrianglePathDiagram.png"))
-  # save_png(multidimensionalPathDiagram, filename  <-  paste0(subfolder, "/", substitute(df), "multidimensionalPathDiagram.png"))
-  # save_png(tesseractPathDiagram, filename <-  paste0(subfolder, "/", substitute(df), "tesseractPathDiagram.png"))
-  # 
-  # # Return the results
-  # models <- list(fitIron, fitMulti, fitTesseract)
-  # results <- compareLavaan(models)
-  # return(results)#, s1 = s1, s2 = s2, s3 = s3))
-  # Define the subfolder
-  subfolder <- "output/images/orgSize"
-  
-  # Check if the subfolder exists, and create it if it doesn't
-  if (!dir.exists(subfolder)) {
-    dir.create(subfolder, recursive = TRUE)
+  # Extract fit measures
+  get_fit_measures <- function(fit) {
+    summary_fit <- summary(fit, fit.measures = TRUE)
+    fit_measures <- list(
+      chisq = ifelse(!is.null(summary_fit$chisq), summary_fit$chisq, NA),
+      df = ifelse(!is.null(summary_fit$df), summary_fit$df, NA),
+      pvalue = ifelse(!is.null(summary_fit$pvalue), summary_fit$pvalue, NA),
+      rmsea = ifelse(!is.null(summary_fit$rmsea), summary_fit$rmsea, NA),
+      cfi = ifelse(!is.null(summary_fit$cfi), summary_fit$cfi, NA),
+      tli = ifelse(!is.null(summary_fit$tli), summary_fit$tli, NA),
+      srmr = ifelse(!is.null(summary_fit$srmr), summary_fit$srmr, NA),
+      aic = ifelse(!is.null(summary_fit$aic), summary_fit$aic, NA),
+      bic = ifelse(!is.null(summary_fit$bic), summary_fit$bic, NA)
+    )
+    return(fit_measures)
   }
   
-  # Define the filenames for the diagrams
-  ironTriangleFilename <- paste0(subfolder, "/", substitute(df), "_ironTrianglePathDiagram.png")
-  multidimensionalFilename <- paste0(subfolder, "/", substitute(df), "_multidimensionalPathDiagram.png")
-  tesseractFilename <- paste0(subfolder, "/", substitute(df), "_tesseractPathDiagram.png")
+  fit_measures_iron <- get_fit_measures(fitIron)
+  fit_measures_multi <- get_fit_measures(fitMulti)
+  fit_measures_tesseract <- get_fit_measures(fitTesseract)
   
-  # Generate the diagrams with the correct file paths
-  ironTrianglePathDiagram <- semPlot::semPaths(fitIron, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex = .9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = ironTriangleFilename, height = 9, width = 6.5, residScale = 10)
-  multidimensionalPathDiagram <- semPlot::semPaths(fitMulti, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex = .9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = multidimensionalFilename, height = 9, width = 6.5, residScale = 10)
-  tesseractPathDiagram <- semPlot::semPaths(fitTesseract, what = "path", whatLabels = "std", style = "lisrel", edge.label.cex = .9, rotation = 1, curve = 2, layoutSplit = FALSE, normalize = FALSE, filetype = "png", filename = tesseractFilename, height = 9, width = 6.5, residScale = 10)
+  # Print extracted fit measures for debugging
+  print("Fit measures for Iron Triangle model:")
+  print(fit_measures_iron)
+  print("Fit measures for Multidimensional model:")
+  print(fit_measures_multi)
+  print("Fit measures for Tesseract model:")
+  print(fit_measures_tesseract)
+  
+  # Ensure all fit measures are available
+  fit_measures <- data.frame(
+    Model = c("Model1", "Model2", "Model3"),
+    chisq = c(fit_measures_iron$chisq, fit_measures_multi$chisq, fit_measures_tesseract$chisq),
+    df = c(fit_measures_iron$df, fit_measures_multi$df, fit_measures_tesseract$df),
+    pvalue = c(fit_measures_iron$pvalue, fit_measures_multi$pvalue, fit_measures_tesseract$pvalue),
+    rmsea = c(fit_measures_iron$rmsea, fit_measures_multi$rmsea, fit_measures_tesseract$rmsea),
+    cfi = c(fit_measures_iron$cfi, fit_measures_multi$cfi, fit_measures_tesseract$cfi),
+    tli = c(fit_measures_iron$tli, fit_measures_multi$tli, fit_measures_tesseract$tli),
+    srmr = c(fit_measures_iron$srmr, fit_measures_multi$srmr, fit_measures_tesseract$srmr),
+    aic = c(fit_measures_iron$aic, fit_measures_multi$aic, fit_measures_tesseract$aic),
+    bic = c(fit_measures_iron$bic, fit_measures_multi$bic, fit_measures_tesseract$bic),
+    dchi = c(NA, fit_measures_multi$chisq - fit_measures_iron$chisq, fit_measures_tesseract$chisq - fit_measures_multi$chisq),
+    ddf = c(NA, fit_measures_multi$df - fit_measures_iron$df, fit_measures_tesseract$df - fit_measures_multi$df),
+    npval = c(NA, pchisq(fit_measures_multi$chisq - fit_measures_iron$chisq, fit_measures_multi$df - fit_measures_iron$df, lower.tail = FALSE), pchisq(fit_measures_tesseract$chisq - fit_measures_multi$chisq, fit_measures_tesseract$df - fit_measures_multi$df, lower.tail = FALSE))
+  )
+  
+  # Print fit measures data frame for debugging
+  print(fit_measures)
+  
+  # Check if the output directory exists, if not create it
+  output_dir <- "output"
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
+  # Save the fit measures as a LaTeX table
+  latex_table <- xtable(fit_measures)
+  latex_filename <- paste0(output_dir, "/fit_measures_", org_size, ".tex")
+  
+  print(paste("Saving LaTeX table to:", latex_filename))  # Debugging statement
+  
+  # Try writing to the file and check for errors
+  tryCatch({
+    print(latex_table, type = "latex", file = latex_filename)
+    print("File saved successfully!")  # Debugging statement
+  }, error = function(e) {
+    print(paste("Error saving file:", e))
+  })
   
   # Return the results
   models <- list(fitIron, fitMulti, fitTesseract)
   results <- compareLavaan(models)
   return(results)
-  
 }
 
-lessThan30 = df_org_size1
-thirtyTo100 = df_org_size2
-hundredTo500 = df_org_size3
-fiveHundredTo1000 = df_org_size4
-moreThan1000 = df_org_size5
+# Run the analysis for each organizational size
+less_than_30_results <- run_analysis(df_org_size1, "less_than_30")
+thirtyTo100_results <- run_analysis(df_org_size2, "thirtyTo100")
+hundredTo500_results <- run_analysis(df_org_size3, "hundredTo500")
+fiveHundredTo1000_results <- run_analysis(df_org_size4, "fiveHundredTo1000")
+moreThan1000_results <- run_analysis(df_org_size5, "moreThan1000")
 
-less_than_30_results <- run_analysis(lessThan30)
-thirtyTo100_results <- run_analysis(thirtyTo100)
-hundredTo500_results <- run_analysis(hundredTo500)
-fiveHundredTo1000_results <- run_analysis(fiveHundredTo1000)
-moreThan1000_results <- run_analysis(moreThan1000)
 
 
